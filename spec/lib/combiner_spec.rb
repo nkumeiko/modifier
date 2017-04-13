@@ -1,4 +1,4 @@
-require File.expand_path('spec_helper', File.dirname(__FILE__))
+require File.expand_path('../spec_helper', File.dirname(__FILE__))
 require 'combiner'
 
 def read_from_enumerator(enumerator)
@@ -40,7 +40,7 @@ describe Combiner do
 	end
 	context "#combine" do
 		subject { combiner.combine(*input_enumerators) }
-	
+
 		context "when an empty set of enumerators are combined" do
 			let(:input_enumerators) { [] }
 			it { should be_empty }
