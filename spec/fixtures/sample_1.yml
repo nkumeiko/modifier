@@ -1,0 +1,46 @@
+-
+   Keyword Unique ID: 101
+
+   Account ID: 202
+   Account Name: 'Account Name Test1'
+   Campaign: 'Campaign Test1'
+   Ad Group: 'Ad Group Test1'
+   Keyword: 'Keyword Test1'
+   Keyword Type: 'Keyword Type Test1'
+   Subid: 'Subid Test1'
+   Paused: 'Paused Test1'
+   Max CPC: 'Max CPC Test1'
+   ACCOUNT: 'ACCOUNT Test1'
+   CAMPAIGN: 'CAMPAIGN Test1'
+   BRAND: 'BRAND Test1'
+   BRAND+CATEGORY: 'BRAND+CATEGORY Test1'
+   ADGROUP: 'ADGROUP Test1'
+   KEYWORD: 'KEYWORD Test1'
+
+   Last Avg CPC: 'Last Avg CPC Test1'
+   Last Avg Pos: 'Last Avg Pos Test1'
+
+   Clicks: 100
+   Impressions: 200
+   ACCOUNT - Clicks: 80
+   CAMPAIGN - Clicks: 85
+   BRAND - Clicks: 75
+   BRAND+CATEGORY - Clicks: 60
+   ADGROUP - Clicks: 50
+   KEYWORD - Clicks: 42
+
+   Avg CPC: 43.55
+   CTR: 2.1
+   Est EPC: 43.4
+   newBid: 44.3
+   Costs: 65.4
+   Avg Pos: 3.3
+
+   number of commissions: '1,23'
+   Commission Value: '1,23'
+   ACCOUNT - Commission Value: '1,23'
+   CAMPAIGN - Commission Value: '1,23'
+   BRAND - Commission Value: '1,23'
+   BRAND+CATEGORY - Commission Value: '1,23'
+   ADGROUP - Commission Value: '1,23'
+   KEYWORD - Commission Value: '1,23'
