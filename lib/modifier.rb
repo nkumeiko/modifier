@@ -13,6 +13,9 @@ class Modifier
   INT_VALUES = ['Clicks', 'Impressions', 'ACCOUNT - Clicks', 'CAMPAIGN - Clicks', 'BRAND - Clicks', 'BRAND+CATEGORY - Clicks', 'ADGROUP - Clicks', 'KEYWORD - Clicks']
   FLOAT_VALUES = ['Avg CPC', 'CTR', 'Est EPC', 'newBid', 'Costs', 'Avg Pos']
 
+  INFLUENCED_BY_CANCELLATION_FACTOR_VALUES = ['number of commissions']
+  INFLUENCED_BY_CANCELLATION_AND_SALEAMOUNT_FACTORS_VALUES = ['Commission Value', 'ACCOUNT - Commission Value', 'CAMPAIGN - Commission Value', 'BRAND - Commission Value', 'BRAND+CATEGORY - Commission Value', 'ADGROUP - Commission Value', 'KEYWORD - Commission Value']
+
   LINES_PER_FILE = 120000
 
   def initialize(saleamount_factor, cancellation_factor)
@@ -20,17 +23,24 @@ class Modifier
     @cancellation_factor = cancellation_factor
   end
 
-  def modify(output, input)
-    input = sort(input)
-
-    input_enumerator = lazy_read(input)
+  def modify(output_filename, *input_filenames)
+    input_filenames = input_filenames.map { |input_filename| sort_by_clicks(input_filename) }
+    input_enumerators = input_filenames.map { |input_filename| lazy_read(input_filename) }
 
     combiner = Combiner.new do |value|
       value[KEYWORD_UNIQUE_ID]
-    end.combine(input_enumerator)
+    end.combine(*input_enumerators)
 
-    merger = Enumerator.new do |yielder|
-      while true
+    merger_enumerator = merge_combined_rows(combiner)
+
+    write2files(output_filename.gsub('.txt', ''), merger_enumerator)
+  end
+
+  private
+
+  def merge_combined_rows(combiner)
+    Enumerator.new do |yielder|
+      loop do
         begin
           list_of_rows = combiner.next
           merged = combine_hashes(list_of_rows)
@@ -40,35 +50,9 @@ class Modifier
         end
       end
     end
-
-    done = false
-    file_index = 0
-    file_name = output.gsub('.txt', '')
-    while not done do
-      CSV.open(file_name + "_#{file_index}.txt", "wb", { :col_sep => "\t", :headers => :first_row, :row_sep => "\r\n" }) do |csv|
-        headers_written = false
-        line_count = 0
-        while line_count < LINES_PER_FILE
-          begin
-            merged = merger.next
-            if not headers_written
-              csv << merged.keys
-              headers_written = true
-              line_count +=1
-            end
-            csv << merged
-            line_count +=1
-          rescue StopIteration
-            done = true
-            break
-          end
-        end
-        file_index += 1
-      end
-    end
   end
 
-  def sort(file)
+  def sort_by_clicks(file)
     output = "#{file}.sorted"
     content_as_table = parse(file)
     headers = content_as_table.headers
@@ -78,7 +62,32 @@ class Modifier
     return output
   end
 
-  private
+  def write2files(base_filename, enumerator)
+    done = false
+    file_index = 0
+    until done do
+      CSV.open(base_filename + "_#{file_index}.txt", "wb", { :col_sep => "\t", :headers => :first_row, :row_sep => "\r\n" }) do |csv|
+        headers_written = false
+        line_count = 0
+        while line_count < LINES_PER_FILE
+          begin
+            merged = enumerator.next
+            if !headers_written
+              csv << merged.keys
+              headers_written = true
+              line_count +=1
+            end
+            csv << merged
+            line_count += 1
+          rescue StopIteration
+            done = true
+            break
+          end
+        end
+        file_index += 1
+      end
+    end
+  end
 
   def combine(merged)
     result = []
@@ -93,7 +102,7 @@ class Modifier
       hash[key] = hash[key].last
     end
     LAST_REAL_VALUE_WINS.each do |key|
-      hash[key] = hash[key].select {|v| not (v.nil? or v == 0 or v == '0' or v == '')}.last
+      hash[key] = hash[key].select { |v| !(v.nil? || v == 0 || v == '0' || v == '') }.last
     end
     INT_VALUES.each do |key|
       hash[key] = hash[key][0].to_s
@@ -101,10 +110,10 @@ class Modifier
     FLOAT_VALUES.each do |key|
       hash[key] = hash[key][0].from_german_to_f.to_german_s
     end
-    ['number of commissions'].each do |key|
+    INFLUENCED_BY_CANCELLATION_FACTOR_VALUES.each do |key|
       hash[key] = (@cancellation_factor * hash[key][0].from_german_to_f).to_german_s
     end
-    ['Commission Value', 'ACCOUNT - Commission Value', 'CAMPAIGN - Commission Value', 'BRAND - Commission Value', 'BRAND+CATEGORY - Commission Value', 'ADGROUP - Commission Value', 'KEYWORD - Commission Value'].each do |key|
+    INFLUENCED_BY_CANCELLATION_AND_SALEAMOUNT_FACTORS_VALUES.each do |key|
       hash[key] = (@cancellation_factor * @saleamount_factor * hash[key][0].from_german_to_f).to_german_s
     end
     hash
