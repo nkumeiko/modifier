@@ -11,7 +11,7 @@ class Modifier
         date
       end
 
-      throw RuntimeError if files.empty?
+      raise RuntimeError, "There is no filenames matching *#{name}*.txt in #{ ENV["HOME"] }/workspace" if files.empty?
 
       files.last
     end

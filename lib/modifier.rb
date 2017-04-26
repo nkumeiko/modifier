@@ -13,8 +13,8 @@ class Modifier
   INT_VALUES = ['Clicks', 'Impressions', 'ACCOUNT - Clicks', 'CAMPAIGN - Clicks', 'BRAND - Clicks', 'BRAND+CATEGORY - Clicks', 'ADGROUP - Clicks', 'KEYWORD - Clicks']
   FLOAT_VALUES = ['Avg CPC', 'CTR', 'Est EPC', 'newBid', 'Costs', 'Avg Pos']
 
-  INFLUENCED_BY_CANCELLATION_FACTOR_VALUES = ['number of commissions']
-  INFLUENCED_BY_CANCELLATION_AND_SALEAMOUNT_FACTORS_VALUES = ['Commission Value', 'ACCOUNT - Commission Value', 'CAMPAIGN - Commission Value', 'BRAND - Commission Value', 'BRAND+CATEGORY - Commission Value', 'ADGROUP - Commission Value', 'KEYWORD - Commission Value']
+  VALUES_INFLUENCED_BY_CANCELLATION_FACTOR = ['number of commissions']
+  VALUES_INFLUENCED_BY_CANCELLATION_AND_SALEAMOUNT_FACTORS = ['Commission Value', 'ACCOUNT - Commission Value', 'CAMPAIGN - Commission Value', 'BRAND - Commission Value', 'BRAND+CATEGORY - Commission Value', 'ADGROUP - Commission Value', 'KEYWORD - Commission Value']
 
   LINES_PER_FILE = 120000
 
@@ -110,10 +110,10 @@ class Modifier
     FLOAT_VALUES.each do |key|
       hash[key] = hash[key][0].from_german_to_f.to_german_s
     end
-    INFLUENCED_BY_CANCELLATION_FACTOR_VALUES.each do |key|
+    VALUES_INFLUENCED_BY_CANCELLATION_FACTOR.each do |key|
       hash[key] = (@cancellation_factor * hash[key][0].from_german_to_f).to_german_s
     end
-    INFLUENCED_BY_CANCELLATION_AND_SALEAMOUNT_FACTORS_VALUES.each do |key|
+    VALUES_INFLUENCED_BY_CANCELLATION_AND_SALEAMOUNT_FACTORS.each do |key|
       hash[key] = (@cancellation_factor * @saleamount_factor * hash[key][0].from_german_to_f).to_german_s
     end
     hash
@@ -152,7 +152,7 @@ class Modifier
   end
 
   def write(content, headers, output)
-    CSV.open(output, "wb", { :col_sep => "\t", :headers => :first_row, :row_sep => "\r\n" }) do |csv|
+    CSV.open(output, "wb", DEFAULT_CSV_OPTIONS.merge(:row_sep => "\r\n")) do |csv|
       csv << headers
       content.each do |row|
         csv << row
