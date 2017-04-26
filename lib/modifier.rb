@@ -38,13 +38,11 @@ class Modifier
 
   private
 
-  def merge_combined_rows(combiner)
+  def merge_combined_rows(enumerator)
     Enumerator.new do |yielder|
       loop do
         begin
-          list_of_rows = combiner.next
-          merged = combine_hashes(list_of_rows)
-          yielder.yield(combine_values(merged))
+          yielder.yield(combine_values(enumerator.next))
         rescue StopIteration
           break
         end
