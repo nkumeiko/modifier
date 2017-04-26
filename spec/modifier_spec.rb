@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe 'modifier.rb' do
   subject(:execute_modifier) do
+    ARGV[0] = 'project_2012-07-27_2012-10-10_performancedata'
     load File.expand_path('modifier.rb', ROOT)
   end
 

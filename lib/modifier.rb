@@ -23,13 +23,13 @@ class Modifier
     @cancellation_factor = cancellation_factor
   end
 
-  def modify(output_filename, *input_filenames)
-    input_filenames = input_filenames.map { |input_filename| sort_by_clicks(input_filename) }
-    input_enumerators = input_filenames.map { |input_filename| lazy_read(input_filename) }
+  def modify(output_filename, input_filename)
+    input_filename = sort_by_clicks(input_filename)
+    input_enumerator = lazy_read(input_filename)
 
     combiner = Combiner.new do |value|
       value[KEYWORD_UNIQUE_ID]
-    end.combine(*input_enumerators)
+    end.combine(input_enumerator)
 
     merger_enumerator = merge_combined_rows(combiner)
 

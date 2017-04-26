@@ -7,7 +7,7 @@ options = {
 }
 
 OptionParser.new do |opts|
-  opts.banner = "Usage: modifier.rb [options] filename [filename_2, ...]"
+  opts.banner = "Usage: modifier.rb [options] filename"
 
   opts.on("-mM", "--modification_factor=M", "Modification factor (default=1)") do |m|
     options[:modification_factor] = m.to_f
@@ -28,10 +28,10 @@ if ARGV.empty?
 end
 
 modified = options[:output] || ARGV[0]
-inputs = ARGV
+input = ARGV[0]
 
-inputs = inputs.map { |input| Modifier::Utils.latest(input) }
+input = Modifier::Utils.latest(input)
 modifier = Modifier.new(options[:modification_factor], options[:cancellaction_factor])
-modifier.modify(modified, *inputs)
+modifier.modify(modified, input)
 
 puts "DONE modifying"
