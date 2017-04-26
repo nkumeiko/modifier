@@ -23,6 +23,7 @@ class Modifier
     @cancellation_factor = cancellation_factor
   end
 
+  # TODO: Revise the logic for multiple input files or get rid of redundant combiner
   def modify(output_filename, input_filename)
     input_filename = sort_by_clicks(input_filename)
     input_enumerator = lazy_read(input_filename)
